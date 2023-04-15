@@ -14,7 +14,7 @@ namespace WebApplication.Controllers
         static ShoppingCart cart = new ShoppingCart();
         private DataSet ds = null;
         static List<Product> products = new List<Product>();
-
+        static String msg = string.Empty;
         public ActionResult Index()
         {
             ds = new GetDataFromDatabase().GetProductsFromDatabase();
@@ -45,8 +45,6 @@ namespace WebApplication.Controllers
         [HttpPost]
         public ActionResult AddToCart(int productId, int quantity)
         {
-
-
             Product prod = products.FirstOrDefault(p => p.ProductID == productId);
 
             cart.AddItem(prod, quantity);
@@ -107,10 +105,45 @@ namespace WebApplication.Controllers
             return View();
         }
 
+
+        [HttpPost]
+        public ActionResult CheckOutProduct(ShoppingCart carts)
+        {
+
+            var ShoppingCheckOutCart = (ShoppingCart)Session["cart"];
+
+            cart = ShoppingCheckOutCart;
+            msg = string.Empty;
+            foreach (var item in cart.GetItems())
+            {
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+                parameters.Add("@ShoppingCarttID", (DateTime.Now.Date - new DateTime(2023, 01, 01).Date).TotalDays);
+                parameters.Add("@ProductID", item.Product.ProductID);
+                parameters.Add("@Quantity", item.Quantity);
+
+
+                msg = new GetDataFromDatabase().DBAddShoppingCart(parameters);
+            }
+
+
+            String search = "successfully";
+
+            if (msg.ToLower().IndexOf(search.ToLower()) != -1)
+            {
+                cart.Discard();
+                ViewBag.GetTotalPrice = 0;
+                ViewBag.GetItemCount = 0;
+
+                Session.Clear();
+            }
+            return RedirectToAction("CheckOutCart", "Home");
+        }
+
         public ActionResult CheckoutCart()
         {
-            ViewBag.Message = "Check out page.";
-
+            ViewBag.Message = msg;
             return View(cart);
         }
     }

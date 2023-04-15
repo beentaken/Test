@@ -6,7 +6,7 @@ using System.Web;
 using System.Configuration;
 using System.Data;
 using System.Security.Cryptography;
-
+using Dapper;
 
 namespace WebApplication.App_Data
 {
@@ -44,10 +44,6 @@ namespace WebApplication.App_Data
 
                     // Create a SqlDataAdapter object to fill the DataSet with the results of the stored procedure
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
-
-                    // Create a DataSet object to hold the data returned by the stored procedure
-
-
                     // Fill the DataSet with the results of the stored procedure
                     adapter.Fill(dataset, Views);
                 }
@@ -61,7 +57,61 @@ namespace WebApplication.App_Data
             }
         }
 
-        public String DBAddShoppingCart(String Storeproc, Dictionary<String, Object> keyValuePairs)
+        public String DBStoreprocInOut(String Storeproc, Dictionary<String, Object> keyValueIn, Dictionary<String, Object> keyValueOut)
+        {
+            String message = "";
+            try
+            {
+
+                // Create a SqlCommand object to execute the stored procedure
+                using (SqlCommand command = new SqlCommand(Storeproc, connection))
+                {
+                    OpenConnection();
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    foreach (KeyValuePair<string, object> parameter in keyValueIn)
+                    {
+                        command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                    }
+
+                    DataSet dataset = new DataSet();
+                    // Create a SqlDataAdapter object to fill the DataSet with the results of the stored procedure
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    // Fill the DataSet with the results of the stored procedure
+                    adapter.Fill(dataset, Storeproc);
+
+                    // Add an output parameter to the stored procedure to capture the return message
+                    SqlParameter messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 100);
+
+                    foreach (KeyValuePair<string, object> parameter in keyValueIn)
+                    {
+                        command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                    }
+
+
+
+
+                    messageParam.Direction = ParameterDirection.Output;
+                    command.Parameters.Add(messageParam);
+
+                    // Execute the stored procedure
+                    command.ExecuteNonQuery();
+
+                    // Retrieve the return message from the stored procedure
+                    message = command.Parameters["@message"].Value.ToString();
+
+                    // Close the connection to the database
+                }
+
+                return message;
+            }
+            catch (SqlException ex)
+            {
+                return "An error occurred while executing the stored procedure: " + ex.Message;
+            }
+        }
+
+        public String DBStoreprocInMsg(String Storeproc, Dictionary<String, Object> keyValuePairs)
         {
             String message = "";
             try
@@ -77,6 +127,12 @@ namespace WebApplication.App_Data
                     {
                         command.Parameters.AddWithValue(parameter.Key, parameter.Value);
                     }
+
+                    DataSet dataset = new DataSet();
+                    // Create a SqlDataAdapter object to fill the DataSet with the results of the stored procedure
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    // Fill the DataSet with the results of the stored procedure
+                    adapter.Fill(dataset, Storeproc);
 
                     // Add an output parameter to the stored procedure to capture the return message
                     SqlParameter messageParam = new SqlParameter("@Message", SqlDbType.NVarChar, 100);

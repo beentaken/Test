@@ -31,20 +31,27 @@
                         <td>@row["Price"]</td>
                         @using (Html.BeginForm("AddToCart", "Home", new { productId = row["ProductID"], quantity = 1 }, FormMethod.Post))
                         {
-                            
+
                             <td><input type="number" id="quantity" name="Quantity" min="1" value="1" /></td>
                             <td>
                                 <button type="submit" class="btn btn-primary">Adds to Cart</button>
                             </td>
                         }
-                        
-                            <td>
-                                @using (Html.BeginForm("RemoveFromCart", "Home", new { index = row["ProductID"] }, FormMethod.Post))
-                                {
-                                    <button type="submit" class="btn btn-primary">Remove</button>
-                                }
-                            </td>
-                        </tr>
+
+                        <td>
+                            @using (Html.BeginForm("RemoveFromCart", "Home", new { index = row["ProductID"] }, FormMethod.Post))
+                            {
+                                <button type="submit" class="btn btn-primary">Remove</button>
+                            }
+                        </td>
+                        <td>
+                            @using (Html.BeginForm("ProductWithId", "Product", new { index = row["ProductID"] }, FormMethod.Post))
+                            {
+                                <button type="submit" class="btn btn-primary">Product</button>
+                            }
+                        </td>
+
+                    </tr>
                 }
             </tbody>
         </table>

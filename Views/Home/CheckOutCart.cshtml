@@ -8,9 +8,7 @@
     {
         if (!string.IsNullOrEmpty(ViewBag.Message))
         {
-
-            <p>@ViewBag.Message</p>
-
+            <div> @ViewBag.Message</div>
         }
         else
         {
@@ -20,7 +18,7 @@
     else
     {
 
-        using (Html.BeginForm("CheckOutProduct", "CheckOutCart", new { carts = Model }, FormMethod.Post))
+        using (Html.BeginForm("CheckOutProduct", "Home", new { carts = Model }, FormMethod.Post))
         {
             <table>
                 <thead>
