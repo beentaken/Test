@@ -19,9 +19,13 @@ namespace WebApplication.Models
         {
             return bc.DBStoreprocInMsg("SpAddShoppingCart", keyValueIn);
         }
-        public String DBGetProduct(Dictionary<String, Object> keyValueIn, Dictionary<String, Object> keyValueOut)
+        public String DBGetProduct(Dictionary<String, Object> keyValueIn, out Dictionary<String, Object> keyValueOut)
         {
-            return bc.DBStoreprocInOut("SpGetProduct", keyValueIn, keyValueOut);
+            return bc.DBStoreprocInOut("SpGetProduct", keyValueIn, out keyValueOut);
+        }
+        public String DBUpdateProduct(Dictionary<String, Object> keyValueIn)
+        {
+            return bc.DBStoreprocInMsg("SpUpdateProduct", keyValueIn);
         }
     }
 }

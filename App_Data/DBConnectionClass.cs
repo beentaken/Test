@@ -6,7 +6,7 @@ using System.Web;
 using System.Configuration;
 using System.Data;
 using System.Security.Cryptography;
-using Dapper;
+
 
 namespace WebApplication.App_Data
 {
@@ -57,7 +57,34 @@ namespace WebApplication.App_Data
             }
         }
 
-        public String DBStoreprocInOut(String Storeproc, Dictionary<String, Object> keyValueIn, Dictionary<String, Object> keyValueOut)
+        public void ExecuteStoredProcedure(String Storeproc, out int outParam1, out string outParam2)
+        {
+            string storedProcedureName = "YourStoredProcedure";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(Storeproc, connection);
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Add output parameters
+                SqlParameter outParam1 = new SqlParameter("@OutParam1", SqlDbType.Int);
+                outParam1.Direction = ParameterDirection.Output;
+                command.Parameters.Add(outParam1);
+
+                SqlParameter outParam2 = new SqlParameter("@OutParam2", SqlDbType.NVarChar, 100);
+                outParam2.Direction = ParameterDirection.Output;
+                command.Parameters.Add(outParam2);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+
+                // Retrieve output parameter values
+                outParam1 = (int)command.Parameters["@OutParam1"].Value;
+                outParam2 = command.Parameters["@OutParam2"].Value.ToString();
+            }
+        }
+
+        public String DBStoreprocInOut(String Storeproc, Dictionary<String, Object> keyValueIn, out Dictionary<String, Object> keyValueOut)
         {
             String message = "";
             try
@@ -86,7 +113,7 @@ namespace WebApplication.App_Data
                     foreach (KeyValuePair<string, object> parameter in keyValueIn)
                     {
                         command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-                    }
+                    } 
 
 
 

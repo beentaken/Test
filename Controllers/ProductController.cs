@@ -8,6 +8,7 @@ using WebApplication.Models;
 using Shopping.Models;
 using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace WebApplication.Controllers
 {
@@ -15,6 +16,7 @@ namespace WebApplication.Controllers
     {
         static ShoppingCartItem cartitem = new ShoppingCartItem();
         static String msg = string.Empty;
+        GetDataFromDatabase DB = new GetDataFromDatabase();
 
         public ActionResult Product()
         {
@@ -31,25 +33,27 @@ namespace WebApplication.Controllers
 
             Dictionary<string, object> paraOut = new Dictionary<string, object>();
 
-            paraOut.Add("@ProductID", index);
-            paraOut.Add("@ProductCode", index);
-            paraOut.Add("@ProductName", index);
-            paraOut.Add("@Category", index);
+            paraOut.Add("@ProductID", p.ProductID);
+            paraOut.Add("@ProductCode", p.ProductCode);
+            paraOut.Add("@ProductName", p.ProductName);
+            paraOut.Add("@Category", p.Category);
+            paraOut.Add("@Quantity", cartitemin.Quantity);
+            paraOut.Add("@Price", p.Price);
 
 
 
-              = new GetDataFromDatabase().DBGetProduct(paraIn, paraOut);
+            DB.DBGetProduct(paraIn, paraOut);
 
-            cartitem.Product.ProductID =
-            cartitem.Quantity =
+      //      cartitem.Product.ProductID =
+      //      cartitem.Quantity =
 
 
-            @ProductID = [ProductID]
-      ,@ProductCode = [ProductCode]
-      ,@ProductName = [ProductName]
-      ,@Category = [Category]
-      ,@Quantity = [Quantity]
-      ,@Price = [Price]
+      //      @ProductID = [ProductID]
+      //,@ProductCode = [ProductCode]
+      //,@ProductName = [ProductName]
+      //,@Category = [Category]
+      //,@Quantity = [Quantity]
+      //,@Price = [Price]
 
 
 
@@ -59,8 +63,19 @@ namespace WebApplication.Controllers
         [HttpPost]
         public ActionResult UpdateProduct(ShoppingCartItem cartitemin)
         {
+
+            Dictionary<string, object> paraIn = new Dictionary<string, object>();
+            Product p = cartitemin.Product;
+
+            paraIn.Add("@ProductID", p.ProductID);
+            paraIn.Add("@ProductCode", p.ProductCode);
+            paraIn.Add("@ProductName", p.ProductName);
+            paraIn.Add("@Category", p.Category);
+            paraIn.Add("@Quantity", cartitemin.Quantity);
+            paraIn.Add("@Price", p.Price);
+
             // Update product in data source using updatedProduct.ProductId
-            UpdateProductById(cartitemin);
+            DB.DBUpdateProduct(paraIn);
             // Redirect to a different action that displays the updated product details
             return RedirectToAction("ViewProduct", new { productId = cartitemin.Product.ProductID });
         }

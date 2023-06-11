@@ -28,7 +28,7 @@
                         <td>@row["ProductName"]</td>
                         <td>@row["Category"]</td>
                         <td>@row["Quantity"]</td>
-                        <td>@row["Price"]</td>
+                        <td>$@row["Price"]</td>
                         @using (Html.BeginForm("AddToCart", "Home", new { productId = row["ProductID"], quantity = 1 }, FormMethod.Post))
                         {
 
